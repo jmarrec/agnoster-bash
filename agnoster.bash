@@ -85,6 +85,8 @@ SEGMENT_SEPARATOR=''
 RIGHT_SEPARATOR=''
 LEFT_SUBSEG=''
 RIGHT_SUBSEG=''
+RUBY_LOGO=''
+PYTHON_LOGO=''
 
 text_effect() {
     case "$1" in
@@ -208,12 +210,20 @@ prompt_end() {
 ### virtualenv prompt
 prompt_virtualenv() {
     if [[ -n $VIRTUAL_ENV ]]; then
-        color=cyan
+        color=yellow
         prompt_segment $color $PRIMARY_FG
-        prompt_segment $color white "$(basename $VIRTUAL_ENV)"
+        prompt_segment $color black "$PYTHON_LOGO $(basename $VIRTUAL_ENV)"
     fi
 }
 
+prompt_rvm(){
+  if [ -e ~/.rvm/bin/rvm-prompt ]; then
+    RUBY_VERSION_=$(~/.rvm/bin/rvm-prompt v)
+    color=red
+    prompt_segment $color $PRIMARY_FG
+    prompt_segment $color white "$RUBY_LOGO $RUBY_VERSION_"
+  fi
+}
 
 ### Prompt components
 # Each component will draw itself, and hide itself if no information needs to be shown
@@ -300,8 +310,10 @@ prompt_hg() {
 }
 
 # Dir: current working directory
+# \w = full path
+# \W = dirname
 prompt_dir() {
-    prompt_segment blue black '\w'
+    prompt_segment blue black '\W'
 }
 
 # Status:
@@ -441,6 +453,7 @@ build_prompt() {
     #[[ -z ${AG_NO_HIST+x} ]] && prompt_histdt
     [[ -z ${AG_NO_CONTEXT+x} ]] && prompt_context
     prompt_virtualenv
+    prompt_rvm
     prompt_dir
     prompt_git
     prompt_hg
@@ -466,3 +479,8 @@ set_bash_prompt() {
 }
 
 PROMPT_COMMAND=set_bash_prompt
+#function title ()
+#{
+#    TITLE=$*;
+#    export PROMPT_COMMAND='echo -ne "\033]0;$TITLE\007"'
+#}
